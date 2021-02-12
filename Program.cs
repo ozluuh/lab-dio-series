@@ -8,7 +8,7 @@ namespace DIO.Series
         {
             string opcaoUsuario = ObterOpcaoUsuario();
 
-            while (opcaoUsuario.ToUpper() != "X")
+            while (opcaoUsuario != "X")
             {
                 switch (opcaoUsuario)
                 {
@@ -19,13 +19,13 @@ namespace DIO.Series
                         InserirSerie();
                         break;
                     case "3":
-                        // AtualizarSerie();
+                        AtualizarSerie();
                         break;
                     case "4":
-                        // ExcluirSerie();
+                        ExcluirSerie();
                         break;
                     case "5":
-                        // VisualizarSerie();
+                        VisualizarSerie();
                         break;
                     case "C":
                         Console.Clear();
@@ -41,10 +41,44 @@ namespace DIO.Series
             Console.ReadLine();
         }
 
+        private static void VisualizarSerie()
+        {
+            Console.Write("Digite o id da série: ");
+            int indiceSerie = int.Parse(Console.ReadLine());
+
+            var serie = repositorio.RetornaPorId(indiceSerie);
+
+            Console.WriteLine(serie);
+        }
+
+        private static void ExcluirSerie()
+        {
+            Console.Write("Digite o id da série: ");
+            int indiceSerie = int.Parse(Console.ReadLine());
+
+            repositorio.Exclui(indiceSerie);
+        }
+
+        private static void AtualizarSerie()
+        {
+            Console.Write("Digite o id da série: ");
+            int indiceSerie = int.Parse(Console.ReadLine());
+
+            Serie novaSerie = GeraSerie();
+
+            repositorio.Atualiza(indiceSerie, novaSerie);
+        }
+
         private static void InserirSerie()
         {
             Console.WriteLine("Inserir nova série");
+            Serie novaSerie = GeraSerie();
 
+            repositorio.Insere(novaSerie);
+        }
+
+        private static Serie GeraSerie()
+        {
             foreach (int i in Enum.GetValues(typeof(Genero)))
             {
                 Console.WriteLine($"{i}-{Enum.GetName(typeof(Genero), i)}");
@@ -62,8 +96,7 @@ namespace DIO.Series
             string entradaDescricao = Console.ReadLine();
 
             Serie novaSerie = new Serie(repositorio.proximoId(), (Genero)entradaGenero, entradaTitulo, entradaDescricao, entradaAno);
-
-            repositorio.Insere(novaSerie);
+            return novaSerie;
         }
 
         private static void ListarSeries()
@@ -80,7 +113,8 @@ namespace DIO.Series
 
             foreach (var serie in lista)
             {
-                Console.WriteLine($"#ID {serie.retornaId()}: {serie.retornaTitulo()}");
+                var excluido = serie.retornaExcluido();
+                Console.WriteLine($"#ID {serie.retornaId()}: {serie.retornaTitulo()} {(excluido ? "*Excluído*" : "")}");
             }
         }
 
@@ -99,7 +133,7 @@ namespace DIO.Series
             Console.WriteLine("X- Sair");
             Console.WriteLine();
 
-            string opcaoUsuario = Console.ReadLine();
+            string opcaoUsuario = Console.ReadLine().ToUpper();
             Console.WriteLine();
             return opcaoUsuario;
         }
